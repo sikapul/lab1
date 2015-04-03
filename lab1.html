@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset=utf-8>
+<meta name="viewport" content="width=620">
+<title>File API</title>
+<body>
+<section id="wrapper">
+    <header>
+      <h1>File API</h1>
+    </header>
+    <p><input type=file></p>
+<style>
+#editable { border: 10px dashed #ccc; height: 500px; margin: 20px auto; overflow-y: scroll;}
+#editable.hover { border: 10px dashed #333; }
+</style>
+
+<article>
+ <div id="editable" contenteditable="true">
+  </div>  
+  <p style="text-align: center"><button id="mybutton">сохранить</button></p>
+  <p id="status">File API & FileReader API not supported</p>
+</article>
+<script>
+var editable = document.getElementById('editable'),
+    state = document.getElementById('status'),
+	upload = document.getElementsByTagName('input')[0],
+	saveButton = document.getElementById('mybutton');
+
+if (typeof window.FileReader === 'undefined') {
+  state.className = 'fail';
+} else {
+  state.className = 'success';
+  state.innerHTML = 'File API & FileReader available';
+}
+ 
+ var fileName;
+ 
+ function download(filename, text) {
+    var pom = document.createElement('a');
+    pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    pom.setAttribute('download', filename);
+
+    if (document.createEvent) {
+        var event = document.createEvent('MouseEvents');
+        event.initEvent('click', true, true);
+        pom.dispatchEvent(event);
+    }
+    else {
+        pom.click();
+    }
+}
+ 
+ saveButton.onclick = function(e){
+	if (typeof fileName != 'undefined')
+	{
+		download(fileName, editable.innerHTML);
+	}
+ }
+ 
+ upload.onchange = function(e){
+	e.preventDefault();
+	var file = upload.files[0],
+		reader = new FileReader
+	fileName = file;
+	reader.onload = function (event) {
+    console.log(event.target);
+	editable.innerHTML = reader.result;
+  }
+  reader.readAsText(file);
+  return false;
+ };
+ 
+editable.ondragover = function () { this.className = 'hover'; return false; };
+editable.ondragend = function () { this.className = ''; return false; };
+editable.ondrop = function (e) {
+  this.className = '';
+  e.preventDefault();
+
+  var file = e.dataTransfer.files[0],
+      reader = new FileReader();
+	fileName = file;
+  reader.onload = function (event) {
+    console.log(event.target);
+	editable.innerHTML = reader.result;
+  };
+  console.log(file);
+  //reader.readAsDataURL(file);
+  
+  //reader.readAsText(buttonFile);
+  reader.readAsText(file);
+
+  return false;
+};
+</script>
+<script>
+var editable = document.getElementById('editable');
+
+</script>
+
+</section>
+<script>
+try {
+var pageTracker = _gat._getTracker("UA-1656750-18");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>
